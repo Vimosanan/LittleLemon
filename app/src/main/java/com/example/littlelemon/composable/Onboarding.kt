@@ -26,7 +26,8 @@ import androidx.navigation.NavHostController
 import com.example.littlelemon.CustomTextField
 import com.example.littlelemon.MainActivity
 import com.example.littlelemon.R
-
+import com.example.littlelemon.Home
+import com.example.littlelemon.Onboarding
 @Composable
 fun Onboarding(navController: NavHostController? = null) {
     val firstName = remember { mutableStateOf("") }
@@ -106,10 +107,15 @@ fun Onboarding(navController: NavHostController? = null) {
                     val sharedPref =
                         context.getSharedPreferences("LITTLE_LEMON", Context.MODE_PRIVATE)
                     with(sharedPref.edit()) {
-                        putBoolean(MainActivity.KEY_IS_ONBOARD, true)
+                        putBoolean(MainActivity.KEY_ON_BOARDED, true)
+                        putString(MainActivity.KEY_FIRST_NAME, firstName.value.trim())
+                        putString(MainActivity.KEY_LAST_NAME, lastname.value.trim())
+                        putString(MainActivity.KEY_EMAIL, email.value.trim())
                         apply()
                     }
-                    navController?.navigate(com.example.littlelemon.Home.route)
+                    navController?.navigate(Home.route) {
+                        popUpTo(Onboarding.route) { inclusive = true }
+                    }
                 }
             },
             shape = RoundedCornerShape(8.dp),

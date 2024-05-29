@@ -7,4 +7,5 @@ object LittleLemonColor {
     val yellow = Color(0xFFF4CE14)
     val white = Color(0xFFFFFFFF)
     val black = Color(0xFF000000)
+    val grey = Color(0xFFEDEFED)
 }

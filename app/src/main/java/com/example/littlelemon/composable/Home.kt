@@ -37,7 +37,7 @@ import com.example.littlelemon.ui.theme.LittleLemonColor
 @Composable
 fun Home(navController: NavHostController? = null, dishes: List<MenuItem>) {
     val searchPhrase = remember { mutableStateOf("") }
-    val filterCategory: MutableState<Category?> = remember { mutableStateOf(null) }
+    val selectedCategory: MutableState<Category?> = remember { mutableStateOf(null) }
 
     val searchItems: List<MenuItem> = if (searchPhrase.value.isEmpty()) {
         dishes
@@ -49,15 +49,13 @@ fun Home(navController: NavHostController? = null, dishes: List<MenuItem>) {
         }
     }
 
-    val filteredItems: List<MenuItem> = if (filterCategory.value == null) {
+    val filteredItems: List<MenuItem> = if (selectedCategory.value == null) {
         searchItems
     } else {
         searchItems.filter {
-            it.category == filterCategory.value
+            it.category == selectedCategory.value
         }
     }
-
-
 
     return Column {
         Row(
@@ -153,17 +151,25 @@ fun Home(navController: NavHostController? = null, dishes: List<MenuItem>) {
                     .background(color = Color(0xFFEAEAEA)),
             )
         }
-        CategoryView { category -> filterCategory.value = category }
+        CategoryView(
+            onTap = { category ->
+                if (selectedCategory.value == null || selectedCategory.value != category) {
+                    selectedCategory.value = category
+                } else {
+                    selectedCategory.value = null
+                }
+            }, currentSelectedCategory = selectedCategory.value
+        )
         LazyColumn {
             itemsIndexed(filteredItems) { _, dish ->
-                MenuDish(navController, dish)
+                MenuDish(dish)
             }
         }
     }
 }
 
 @Composable
-fun CategoryView(onTap: (Category) -> Unit) {
+fun CategoryView(onTap: (Category) -> Unit, currentSelectedCategory: Category?) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -173,30 +179,33 @@ fun CategoryView(onTap: (Category) -> Unit) {
             text = stringResource(id = R.string.home_subtitle),
             fontWeight = FontWeight.ExtraBold,
             fontSize = 20.sp,
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 12.dp)
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
         )
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 12.dp)
         ) {
-            items(Category.values().size) { index ->
+            items(Category.entries.size) { index ->
+                val category = Category.entries[index]
+
                 Card(
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .height(48.dp)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color(0xFFEDEFED))
-                            .clickable { onTap(Category.values()[index]) }
-                            .padding(horizontal = 16.dp), contentAlignment = Alignment.Center
-                    ) {
+                    Box(modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            if (currentSelectedCategory == category) LittleLemonColor.yellow
+                            else LittleLemonColor.grey
+                        )
+                        .clickable { onTap(category) }
+                        .padding(horizontal = 16.dp),
+                        contentAlignment = Alignment.Center) {
                         Text(
-                            text = Category.values()[index].title,
+                            text = category.title,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = LittleLemonColor.green
@@ -206,17 +215,15 @@ fun CategoryView(onTap: (Category) -> Unit) {
             }
         }
         Divider(
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
+            modifier = Modifier.padding(horizontal = 16.dp)
         )
     }
 }
 
 @Composable
-fun MenuDish(navController: NavHostController? = null, dish: MenuItem) {
+fun MenuDish(dish: MenuItem) {
     Column(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
+        modifier = Modifier.padding(horizontal = 16.dp)
     ) {
         Row(
             modifier = Modifier
@@ -225,9 +232,7 @@ fun MenuDish(navController: NavHostController? = null, dish: MenuItem) {
         ) {
             Column {
                 Text(
-                    text = dish.title,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
+                    text = dish.title, fontSize = 24.sp, fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = dish.description,
@@ -237,9 +242,7 @@ fun MenuDish(navController: NavHostController? = null, dish: MenuItem) {
                         .padding(top = 5.dp, bottom = 8.dp)
                 )
                 Text(
-                    text = "\$${dish.price}",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.W400
+                    text = "\$${dish.price}", fontSize = 22.sp, fontWeight = FontWeight.W400
                 )
             }
             Image(

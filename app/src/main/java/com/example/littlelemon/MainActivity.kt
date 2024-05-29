@@ -1,6 +1,7 @@
 package com.example.littlelemon
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -44,18 +45,16 @@ class MainActivity : ComponentActivity() {
         setContent {
             LittleLemonTheme {
                 val sharedPreferences = getSharedPreferences("LITTLE_LEMON", Context.MODE_PRIVATE)
-                val isOnboarded = sharedPreferences.getBoolean(KEY_IS_ONBOARD, false)
+
+                val onBoarded = sharedPreferences.getBoolean(KEY_ON_BOARDED, false)
 
                 val menuItemsRoom =
                     database.menuItemDao().getAll().observeAsState(initial = emptyList())
-                val orderMenuItems = remember { mutableStateOf(false) }
-                val searchPhrase = remember { mutableStateOf("") }
-
 
                 val navController = rememberNavController()
                 NavHost(
                     navController = navController,
-                    startDestination = if (isOnboarded) Home.route else Onboarding.route
+                    startDestination = if (onBoarded) Home.route else Onboarding.route
                 ) {
                     composable(Onboarding.route) {
                         Onboarding(navController)
@@ -64,7 +63,16 @@ class MainActivity : ComponentActivity() {
                         Home(navController, menuItemsRoom.value)
                     }
                     composable(Profile.route) {
-                        Profile(navController)
+                        val firstName = sharedPreferences.getString(KEY_FIRST_NAME, null)
+                        val lastName = sharedPreferences.getString(KEY_LAST_NAME, null)
+                        val email = sharedPreferences.getString(KEY_EMAIL, null)
+
+                        var user: User? = null
+                        if (firstName != null && lastName != null && email != null) {
+                            user = User(firstName, lastName, email)
+                        }
+
+                        Profile(navController, user!!)
                     }
                 }
             }
@@ -87,6 +95,9 @@ class MainActivity : ComponentActivity() {
     }
 
     companion object {
-        const val KEY_IS_ONBOARD: String = "is_onboarded"
+        const val KEY_ON_BOARDED: String = "ON_BOARDED"
+        const val KEY_FIRST_NAME: String = "first_name"
+        const val KEY_LAST_NAME: String = "last_name"
+        const val KEY_EMAIL: String = "email"
     }
 }

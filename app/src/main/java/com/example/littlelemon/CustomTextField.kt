@@ -25,7 +25,8 @@ fun CustomTextField(
     text: String,
     onValueChanged: (String) -> Unit,
     label: String,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    enabled: Boolean = true
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
         Text(
@@ -36,6 +37,7 @@ fun CustomTextField(
             value = text,
             onValueChange = onValueChanged,
             keyboardOptions = keyboardOptions,
+            enabled = enabled,
             modifier = Modifier
                 .fillMaxWidth()
                 .border(

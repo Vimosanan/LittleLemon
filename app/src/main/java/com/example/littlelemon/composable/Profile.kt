@@ -19,17 +19,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
+import com.example.littlelemon.Onboarding
+import com.example.littlelemon.Home
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.littlelemon.CustomTextField
 import com.example.littlelemon.R
+import com.example.littlelemon.User
 
 @Composable
-fun Profile(navController: NavHostController? = null) {
-    val firstName = remember { mutableStateOf("") }
-    val lastname = remember { mutableStateOf("") }
-    val email = remember { mutableStateOf("") }
+fun Profile(navController: NavHostController? = null, user: User) {
+    val firstName = remember { mutableStateOf(user.firstName) }
+    val lastname = remember { mutableStateOf(user.lastName) }
+    val email = remember { mutableStateOf(user.email) }
 
     val context = LocalContext.current
     return Column(
@@ -62,18 +64,21 @@ fun Profile(navController: NavHostController? = null) {
             CustomTextField(
                 firstName.value,
                 { text -> firstName.value = text },
-                stringResource(id = R.string.first_name)
+                stringResource(id = R.string.first_name),
+                enabled = false
             )
             CustomTextField(
                 lastname.value,
                 { text -> lastname.value = text },
-                stringResource(id = R.string.last_name)
+                stringResource(id = R.string.last_name),
+                enabled = false
             )
             CustomTextField(
                 email.value,
                 { text -> email.value = text },
                 stringResource(id = R.string.email),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                enabled = false
             )
         }
         Button(
@@ -84,7 +89,7 @@ fun Profile(navController: NavHostController? = null) {
                     clear()
                     apply()
                 }
-                navController?.popBackStack(com.example.littlelemon.Onboarding.route, false)
+                navController?.navigate(Onboarding.route)
             },
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(
@@ -106,5 +111,5 @@ fun Profile(navController: NavHostController? = null) {
 @Preview(showBackground = true)
 @Composable
 fun ProfilePreview() {
-    Profile()
+    Profile(user = User("Vimo", "Ahil", "vimo@gmail.com"))
 }
