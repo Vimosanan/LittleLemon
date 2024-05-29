@@ -83,13 +83,15 @@ fun Profile(navController: NavHostController? = null, user: User) {
         }
         Button(
             onClick = {
-                val sharedPref =
-                    context.getSharedPreferences("LITTLE_LEMON", Context.MODE_PRIVATE)
+                val sharedPref = context.getSharedPreferences("LITTLE_LEMON", Context.MODE_PRIVATE)
                 with(sharedPref.edit()) {
                     clear()
                     apply()
                 }
-                navController?.navigate(Onboarding.route)
+
+                navController?.navigate(Onboarding.route) {
+                    popUpTo(Home.route) { inclusive = false }
+                }
             },
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(

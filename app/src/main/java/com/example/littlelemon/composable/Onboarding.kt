@@ -28,6 +28,7 @@ import com.example.littlelemon.MainActivity
 import com.example.littlelemon.R
 import com.example.littlelemon.Home
 import com.example.littlelemon.Onboarding
+
 @Composable
 fun Onboarding(navController: NavHostController? = null) {
     val firstName = remember { mutableStateOf("") }
@@ -114,7 +115,7 @@ fun Onboarding(navController: NavHostController? = null) {
                         apply()
                     }
                     navController?.navigate(Home.route) {
-                        popUpTo(Onboarding.route) { inclusive = true }
+                        popUpTo(Onboarding.route) { inclusive = false }
                     }
                 }
             },
